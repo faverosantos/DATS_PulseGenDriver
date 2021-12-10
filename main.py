@@ -10,7 +10,7 @@ def main():
 
     comPort = 'COM4'
     baudrate = 115200
-    numberOfPulses = 2
+    numberOfPulses = 1
     repetitionRate = 10000
 
     myPGDriver.connect(comPort, baudrate)

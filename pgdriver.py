@@ -3,7 +3,7 @@
 import serial
 import time
 
-DEBUG_MODE = True
+DEBUG_MODE = False
 
 class PGDriver:
 
@@ -23,63 +23,73 @@ class PGDriver:
         try:
             self.handler = serial.Serial(comPort, baud)
         except Exception as e:
-            raise Exception("Erro ao inicializar a porta: " + self.port)
+            raise Exception("Exception: error while initializing port " + self.port) + "."
         time.sleep(1)
 
         if DEBUG_MODE:
-            print("Pulse Generator Driver: conectado!")
+            print("DEBUG_MODE: Pulse Generator Driver: connected.")
 
     def configure(self, nPulses, repRate):
-        self.numberOfPulses = nPulses
-        self.repetitionRate = repRate
+        if 14 >= nPulses >= 1:
+            self.numberOfPulses = nPulses
+        else:
+            self.numberOfPulses = 14
+            print("WARNING: number of pulses set to 14.")
+
+        if 100000 >= repRate >= 10:
+            self.repetitionRate = repRate
+        else:
+            self.repetitionRate = 100000
+            print("WARNING: repetition rate set to 100 kHz.")
 
         message = "frequency:" + str(self.repetitionRate) + "\r\n"
         try:
             self.handler.write(message.encode())
         except Exception as e:
-            raise Exception("Erro ao escrever a frequência!")
+            raise Exception("Exception: error while trying to write frequency value.")
         time.sleep(1)
 
         message = "pulse:" + str(self.numberOfPulses) + "\r\n"
         try:
             self.handler.write(message.encode())
         except Exception as e:
-            raise Exception("Erro ao escrever a quantidade de pulsos!")
+            raise Exception("Exception: error while trying to write number of pulses.")
         time.sleep(1)
 
         if DEBUG_MODE:
-            print("Pulse Generator Driver: configurado!")
+            print("DEBUG_MODE: Pulse Generator Driver: configured.")
 
     def enable(self):
         message = "enable" + "\r\n"
         try:
             self.handler.write(message.encode())
         except Exception as e:
-            raise Exception("Erro ao escrever 'enable'")
+            raise Exception("Exception: error while writing 'enable'.")
+
         time.sleep(1)
 
         if DEBUG_MODE:
-            print("Pulse Generator Driver: enabled!")
+            print("DEBUG_MODE: Pulse Generator Driver: enabled.")
 
     def disable(self):
         message = "disable" + "\r\n"
         try:
             self.handler.write(message.encode())
         except Exception as e:
-            raise Exception("Erro ao escrever 'disable'")
+            raise Exception("Exception: error while writing 'disable'.")
         time.sleep(1)
 
         if DEBUG_MODE:
-            print("Pulse Generator Driver: disabled!")
+            print("DEBUG_MODE: Pulse Generator Driver: disabled.")
 
     def disconnect(self):
         try:
             self.handler.close()
         except Exception as e:
-            raise Exception("Erro ao fechar a porta " + self.port)
+            raise Exception("Exception: error while trying to close port " + self.port + ".")
         time.sleep(1)
 
         del self.handler
 
         if DEBUG_MODE:
-            print("Pulse Generator Driver: disconnected!")
+            print("DEBUG_MODE: Pulse Generator Driver: disconnected.")
